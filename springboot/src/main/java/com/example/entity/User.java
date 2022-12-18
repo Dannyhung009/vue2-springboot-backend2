@@ -1,5 +1,9 @@
 package com.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,14 +11,19 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@TableName(value = "sys_user")
 public class User {
+    @TableId(value = "id")
     private Integer id;
     private String username;
+    @JsonIgnore
     private String password;
     private String nickname;
     private String email;
     private String phone;
     private String address;
+//    @TableField(value = "avatar_url")//指定數據庫的字段名稱
+    private String avatarUrl;
 
 
 }

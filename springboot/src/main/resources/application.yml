@@ -10,9 +10,12 @@ spring:
    password: 088220
 
 mybatis:
-#  ?????xml????
   mapper-locations:
     classpath:mapper/*.xml
-#  ??
+# for mybatis
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# for mybatis plus
+mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
