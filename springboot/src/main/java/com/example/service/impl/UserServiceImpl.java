@@ -12,12 +12,12 @@ import java.util.List;
 public class UserServiceImpl extends ServiceImpl<UserMapper,User> {
 
     public Boolean saveUser(User user) {
-//        if(user.getId()==null){
-//            return save(user);// mybatis-plus提供的方法，表示插入數據
-//        }else{
-//            return updateById(user);
-//        }
-        return saveOrUpdate(user);
+        if(user.getId()==null){
+            return save(user);// mybatis-plus提供的方法，表示插入數據
+        }else{
+            return updateById(user);
+        }
+//        return saveOrUpdate(user);
     }
 
 

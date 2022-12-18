@@ -40,9 +40,17 @@ public class UserController {
         return userServiceImpl.findAll();
     }
 
+
+    //刪除
     @DeleteMapping("/user/{id}")
     public boolean delete(@PathVariable Integer id) {
         return userServiceImpl.removeById(id);
+
+    }
+    //批次刪除
+    @PostMapping("/user/delBatch")
+    public boolean deleteBatch(@RequestBody List<Integer> ids) {
+        return userServiceImpl.removeBatchByIds(ids);
 
     }
 
@@ -54,18 +62,19 @@ public class UserController {
     @GetMapping("/user/page")
     public IPage<User> findPage(@RequestParam Integer pageNum,
                                 @RequestParam Integer pageSize,
-                                @RequestParam (defaultValue = "")String username,
-                                @RequestParam (defaultValue = "")String email,
-                                @RequestParam (defaultValue = "")String address
+                                @RequestParam(defaultValue = "") String username,
+                                @RequestParam(defaultValue = "") String email,
+                                @RequestParam(defaultValue = "") String address
     ) {
-        IPage<User> page = new Page<>(pageNum,pageSize);
+        IPage<User> page = new Page<>(pageNum, pageSize);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("username",username);
-        queryWrapper.and(w->w.like("email",email));
+        queryWrapper.like("username", username);
+        queryWrapper.and(w -> w.like("email", email));
 //        queryWrapper.like("nickname",nickname);
-        queryWrapper.like("address",address);
+        queryWrapper.like("address", address);
         //使用or 方法
 //        queryWrapper.or().like("address",address);
+        queryWrapper.orderByDesc("create_time");
         IPage<User> userIPage = userServiceImpl.page(page, queryWrapper);
         return userIPage;
     }
