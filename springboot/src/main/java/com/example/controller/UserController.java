@@ -2,11 +2,13 @@ package com.example.controller;
 
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.example.controller.dto.UserDto;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.*;
@@ -161,6 +163,18 @@ public class UserController {
 //        System.out.println(list); //測試有是否讀取成功
 
         return userService.saveBatch(users);
+    }
+
+    @PostMapping("/login")
+    public Boolean login(@RequestBody UserDto userdto){
+        String username = userdto.getUsername();
+        String password = userdto.getPassword();
+        //檢驗前端傳入資料
+        if(StrUtil.isBlank(username) || StrUtil.isBlank(password)){
+            return false;
+        }
+
+        return userService.login(userdto);
     }
 
 
