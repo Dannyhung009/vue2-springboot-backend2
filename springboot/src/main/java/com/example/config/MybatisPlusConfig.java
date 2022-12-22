@@ -1,4 +1,4 @@
-package com.example.common;
+package com.example.config;
 
 
 import com.baomidou.mybatisplus.annotation.DbType;

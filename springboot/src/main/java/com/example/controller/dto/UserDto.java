@@ -11,4 +11,7 @@ import java.io.Serializable;
 public class UserDto implements Serializable {
     private String username;
     private String password;
+    private String nickname;
+    private String avatarUrl;
+    private String token;
 }

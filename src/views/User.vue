@@ -34,7 +34,7 @@
 
       <el-upload action="http://localhost:9090/user/import" style="display: inline-block"
                  :show-file-list="false"
-                 :accept="xlsx"
+                 accept="xlsx"
                  :on-success="handleExcelImportSuccess">
 
         <el-button type="primary" @click="handleImport">導入<i class="el-icon-circle-plus-outline"></i></el-button>
@@ -164,9 +164,12 @@ export default {
         }
       })
           .then(res => {
-            // console.log(res)
-            this.tableData = res.records
-            this.total = res.total
+            if(res.data){
+              // console.log(res)
+              this.tableData = res.data.records
+              this.total = res.data.total
+            }
+
           })
 
       // //改用axios
@@ -215,7 +218,7 @@ export default {
       this.request.delete("/user/" + id)
           .then(res => {
             console.log(res)
-            if (res) {
+            if (res.data) {
               this.$message.success("刪除成功")
             } else {
               this.$message.error("刪除失敗")
@@ -236,17 +239,21 @@ export default {
       this.request.post("/user", this.form)
           .then(res => {
             console.log(res)
-            if (res) {
+            if (res.data) {
               this.$message.success("新增成功")
+              this.dialogFormVisible = false
+              this.load()
             } else {
               this.$message.error("新增失敗")
+              this.dialogFormVisible = false
+              this.load()
             }
 
           })
 
 
-      this.dialogFormVisible = false
-      this.load()
+
+
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -261,13 +268,15 @@ export default {
       this.request.post("/user/delBatch", ids)
           .then(res => {
             console.log(res)
-            if (res) {
+            if (res.data) {
               this.$message.success("批量刪除成功")
+              this.load()
             } else {
               this.$message.error("批量刪除失敗")
+              this.load()
             }
           })
-      this.load()
+
     },
     handleExcelImportSuccess(){
       this.$message.success("Excel導入成功")

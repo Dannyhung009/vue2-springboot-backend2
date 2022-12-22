@@ -8,7 +8,10 @@ import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.example.common.Constants;
+import com.example.common.Result;
 import com.example.controller.dto.UserDto;
+import com.example.utils.TokenUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.*;
@@ -47,33 +50,45 @@ public class UserController {
 
     //新增或更新
     @PostMapping
-    public Boolean saveUser(@RequestBody User user) {
+    public Result saveUser(@RequestBody User user) {
+        boolean b = userService.saveOrUpdate(user);
 
-        return userService.saveOrUpdate(user);
+        return Result.success(b);
     }
 
     //刪除
     @DeleteMapping("/{id}")
-    public Boolean delete(@PathVariable Integer id) {
-        return userService.removeById(id);
+    public Result delete(@PathVariable Integer id) {
+        boolean b = userService.removeById(id);
+        return Result.success(b);
 
     }
 
     //查詢所有
     @GetMapping
-    public List<User> findall() {
-        return userService.list();
+    public Result findall() {
+        List<User> list = userService.list();
+        return Result.success(list);
     }
 
     //根據ID查詢
     @GetMapping("/{id}")
-    public User findOne(@PathVariable Integer id) {
-        return userService.getById(id);
+    public Result findOne(@PathVariable Integer id) {
+        User user = userService.getById(id);
+        return Result.success(user);
+    }
+
+    @GetMapping("/username/{username}")
+    public Result findByUsername(@PathVariable String username) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username",username);
+        User one = userService.getOne(queryWrapper);
+        return Result.success(one);
     }
 
     //分頁查詢
     @GetMapping("/page")
-    public Page<User> findPage(@RequestParam Integer pageNum,
+    public Result findPage(@RequestParam Integer pageNum,
                                @RequestParam Integer pageSize,
                                @RequestParam(defaultValue = "") String username,
                                @RequestParam(defaultValue = "") String email,
@@ -86,19 +101,24 @@ public class UserController {
         //使用or 方法
 //        queryWrapper.or().like("address",address);
         queryWrapper.orderByDesc("create_time");
-        return userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+        Page<User> page = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+        return Result.success(page);
+
+
 //        return userService.page(new Page<>(pageNum, pageSize));
     }
 
     //批次刪除
     @PostMapping("/delBatch")
-    public boolean deleteBatch(@RequestBody List<Integer> ids) {
-        return userService.removeBatchByIds(ids);
+    public Result deleteBatch(@RequestBody List<Integer> ids) {
+        boolean b = userService.removeBatchByIds(ids);
+
+        return Result.success(b);
 
     }
 
     @GetMapping("/export")
-    public void export(HttpServletResponse response) throws Exception {
+    public Result export(HttpServletResponse response) throws Exception {
         //從資料庫查出所有的數據
         List<User> list = userService.list();
         //通過工具類創建writer 寫出到磁盤路徑
@@ -128,11 +148,13 @@ public class UserController {
         out.close();
         writer.close();
 
+        return Result.success();
+
 
     }
 
     @PostMapping("/import")
-    public Boolean importExcel(MultipartFile file) throws Exception {
+    public Result importExcel(MultipartFile file) throws Exception {
         InputStream inputStream = file.getInputStream();
         ExcelReader reader = ExcelUtil.getReader(inputStream);
         //方式一
@@ -162,19 +184,46 @@ public class UserController {
 
 //        System.out.println(list); //測試有是否讀取成功
 
-        return userService.saveBatch(users);
+        boolean b = userService.saveBatch(users);
+        return Result.success(b);
     }
-
+//舊版本
+    //    @PostMapping("/login")
+//    public Boolean login(@RequestBody UserDto userdto){
+//        String username = userdto.getUsername();
+//        String password = userdto.getPassword();
+//        //檢驗前端傳入資料
+//        if(StrUtil.isBlank(username) || StrUtil.isBlank(password)){
+//            return false;
+//        }
+//
+//        return userService.login(userdto);
+//    }
+    //新版
     @PostMapping("/login")
-    public Boolean login(@RequestBody UserDto userdto){
-        String username = userdto.getUsername();
-        String password = userdto.getPassword();
+    public Result login(@RequestBody UserDto userDto) {
+        String username = userDto.getUsername();
+        String password = userDto.getPassword();
         //檢驗前端傳入資料
-        if(StrUtil.isBlank(username) || StrUtil.isBlank(password)){
-            return false;
+        if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
+            return Result.error(Constants.CODE_400,"參數錯誤");
         }
+        UserDto dto = userService.login(userDto);
 
-        return userService.login(userdto);
+
+        return Result.success(dto);
+    }
+    @PostMapping("/register")
+    public Result register(@RequestBody UserDto userDto) {
+        String username = userDto.getUsername();
+        String password = userDto.getPassword();
+        //檢驗前端傳入資料
+        if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
+            return Result.error(Constants.CODE_400,"參數錯誤");
+        }
+        User user = userService.register(userDto);
+
+        return Result.success(user);
     }
 
 
