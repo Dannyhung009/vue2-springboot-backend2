@@ -1,13 +1,12 @@
-
 server:
   port: 9090
 
 spring:
   datasource:
-   driver-class-name: com.mysql.cj.jdbc.Driver
-   url: jdbc:mysql://localhost:3306/springboot-vue2?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2b8
-   username: root
-   password: 088220
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/springboot-vue2?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2b8
+    username: root
+    password: 088220
 
 mybatis:
   mapper-locations:
@@ -22,4 +21,4 @@ mybatis-plus:
 
 files:
   upload:
-    path: D:/work/JAVA/vue1/files
+    path: D:/work/JAVA/vue1/springboot/files/
