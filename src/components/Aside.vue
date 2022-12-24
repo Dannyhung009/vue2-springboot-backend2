@@ -10,7 +10,7 @@
   >
     <!--          LOGO區域-->
     <div style="height:60px;line-height: 60px;text-align: center">
-      <img src="../assets/logo.png" width="20px" style="position: relative; top: 5px;margin-right: 5px">
+      <img src="https://th.bing.com/th/id/OIP.RYWIKT1OT7eXdjEwxCNumwHaHa?pid=ImgDet&w=600&h=600&rs=1" width="20px" style="position: relative; top: 5px;margin-right: 5px">
       <b style="color:orange" v-show="logoTextShow">後台管理系統</b>
     </div>
     <el-menu-item index="/">

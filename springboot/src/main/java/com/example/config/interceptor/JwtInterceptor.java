@@ -1,8 +1,11 @@
-package com.example.common.interceptor;
+package com.example.config.interceptor;
 
 import cn.hutool.core.util.StrUtil;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.common.Constants;
 import com.example.entity.User;
 import com.example.exception.ServiceException;
@@ -15,7 +18,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Component
+
 public class JwtInterceptor implements HandlerInterceptor {
 
     @Autowired
@@ -29,10 +32,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         if(!(handler instanceof HandlerMethod)){
             return true;
         }
-        // 执行认证
-//        if (token == null) {
-//            throw new RuntimeException("无token，请重新登录");
-//        }
+
         // 执行认证
         if (StrUtil.isBlank(token)) {
             throw new ServiceException(Constants.CODE_401,"无token，请重新登录");
@@ -42,16 +42,22 @@ public class JwtInterceptor implements HandlerInterceptor {
         try {
             userId = JWT.decode(token).getAudience().get(0);
         } catch (JWTDecodeException j) {
-            throw new ServiceException(Constants.CODE_401,"token驗證失敗");
+            throw new ServiceException(Constants.CODE_401,"token驗證失敗，请重新登录");
         }
         //根據token中的userid查詢資料庫
         User user = userService.getById(userId);
         if (user == null) {
             throw new ServiceException(Constants.CODE_401,"用户不存在，请重新登录");
         }
+        // 验证 token，使用用戶密碼做signature 簽名
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassword())).build();
+        try {
+            jwtVerifier.verify(token);
+        } catch (JWTVerificationException e) {
+            throw new ServiceException(Constants.CODE_401,"token驗證失敗，请重新登录");
+        }
+        return true;
 
-
-        return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 
 

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import ElementUI from "element-ui";
 
 const request = axios.create({
     baseURL: 'http://localhost:9090',
@@ -34,6 +35,14 @@ request.interceptors.response.use(
         if (typeof res === 'string') {
             res = res ? JSON.parse(res) : res
         }
+        //當權限驗證不通過的時候給予錯誤提示
+        if(res.code === '401'){
+            ElementUI.Message({
+                message: res.msg,
+                type:'error'
+            })
+        }
+
         return res;
     },
     error => {

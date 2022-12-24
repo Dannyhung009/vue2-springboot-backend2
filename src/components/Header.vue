@@ -14,7 +14,7 @@
       </el-breadcrumb>
     </div>
     <!--下拉選單-->
-    <el-dropdown style="width:100px; cursor: pointer">
+    <el-dropdown style="width:200px; cursor: pointer;text-align: right">
       <div>
         <img :src="user.avatarUrl" style="width:30px;border-radius: 50%;position: relative;top: 10px;right:5px">
         <span><i class="el-icon-setting"></i> {{ user.nickname }} </span><i class="el-icon-arrow-down"
@@ -50,8 +50,14 @@ export default {
     // console.log(this.$route)
   },
   computed: {
-    currentPathName() {
-      return this.$store.state.currentPathName;  //需要監聽的數據
+    currentPathName:{
+      get() {
+        return this.$store.state.currentPathName;  //需要監聽的數據
+      },
+      set(val){
+        this.currentPathName = val
+      }
+
     }
   },
   watch: { //監聽路由變化

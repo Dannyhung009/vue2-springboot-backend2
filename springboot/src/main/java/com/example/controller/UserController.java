@@ -36,6 +36,7 @@ import static cn.hutool.poi.excel.sax.ElementName.row;
 /**
  * <p>
  * 前端控制器
+ * 使用者資料接口(End point)
  * </p>
  *
  * @author danny
@@ -81,7 +82,7 @@ public class UserController {
     @GetMapping("/username/{username}")
     public Result findByUsername(@PathVariable String username) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username",username);
+        queryWrapper.eq("username", username);
         User one = userService.getOne(queryWrapper);
         return Result.success(one);
     }
@@ -89,10 +90,10 @@ public class UserController {
     //分頁查詢
     @GetMapping("/page")
     public Result findPage(@RequestParam Integer pageNum,
-                               @RequestParam Integer pageSize,
-                               @RequestParam(defaultValue = "") String username,
-                               @RequestParam(defaultValue = "") String email,
-                               @RequestParam(defaultValue = "") String address) {
+                           @RequestParam Integer pageSize,
+                           @RequestParam(defaultValue = "") String username,
+                           @RequestParam(defaultValue = "") String email,
+                           @RequestParam(defaultValue = "") String address) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("username", username);
         queryWrapper.and(w -> w.like("email", email));
@@ -102,6 +103,13 @@ public class UserController {
 //        queryWrapper.or().like("address",address);
         queryWrapper.orderByDesc("create_time");
         Page<User> page = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+
+        //測試獲取當前使用者資訊
+        if (TokenUtils.getCurrentUser() != null) {
+            User currentUser = TokenUtils.getCurrentUser();
+            System.out.println(currentUser);
+
+        }
         return Result.success(page);
 
 
@@ -187,7 +195,8 @@ public class UserController {
         boolean b = userService.saveBatch(users);
         return Result.success(b);
     }
-//舊版本
+
+    //舊版本
     //    @PostMapping("/login")
 //    public Boolean login(@RequestBody UserDto userdto){
 //        String username = userdto.getUsername();
@@ -206,20 +215,21 @@ public class UserController {
         String password = userDto.getPassword();
         //檢驗前端傳入資料
         if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
-            return Result.error(Constants.CODE_400,"參數錯誤");
+            return Result.error(Constants.CODE_400, "參數錯誤");
         }
         UserDto dto = userService.login(userDto);
 
 
         return Result.success(dto);
     }
+
     @PostMapping("/register")
     public Result register(@RequestBody UserDto userDto) {
         String username = userDto.getUsername();
         String password = userDto.getPassword();
         //檢驗前端傳入資料
         if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
-            return Result.error(Constants.CODE_400,"參數錯誤");
+            return Result.error(Constants.CODE_400, "參數錯誤");
         }
         User user = userService.register(userDto);
 
