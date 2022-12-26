@@ -28,8 +28,14 @@
       </template>
       <el-menu-item index="/user">
         <template slot="title">
-          <i class="el-icon-s-custom"></i>
+          <i class="el-icon-document"></i>
           <span slot="title">用戶管理</span>
+        </template>
+      </el-menu-item>
+      <el-menu-item index="/file">
+        <template slot="title">
+          <i class="el-icon-s-custom"></i>
+          <span slot="title">文件管理</span>
         </template>
       </el-menu-item>
 

@@ -1,23 +1,21 @@
 <template>
   <div>
-
     <!--          搜尋欄-->
     <div style="margin:10px 0">
       <el-input placeholder="請輸入名稱" clearable style="width: 200px" suffix-icon="el-icon-search" class="ml-5"
-                v-model="username"></el-input>
-      <el-input placeholder="請輸入email" clearable style="width: 200px" suffix-icon="el-icon-search" class="ml-5"
-                v-model="email"></el-input>
-      <el-input placeholder="請輸入地址" clearable style="width: 200px" suffix-icon="el-icon-search" class="ml-5"
-                v-model="address"></el-input>
+                v-model="name"></el-input>
       <el-button class="ml-5" type="primary" icon="el-icon-search" @click="load">搜尋</el-button>
       <el-button class="ml-5" type="warning" icon="el-icon-search" @click="reset">重置</el-button>
-
     </div>
     <!--          表格區域-->
     <div style="margin:10px 0">
-      <el-button type="primary" @click="handleAdd">新增<i class="el-icon-circle-plus-outline"></i></el-button>
-      <!--            <el-button type="primary" @click="handleEdit">修改<i class="el-icon-circle-plus-outline"></i></el-button>-->
-      <!--            <el-button type="primary" @click="handleDelete">刪除<i class="el-icon-circle-plus-outline"></i></el-button>-->
+      <el-upload action="http://localhost:9090/file/upload" style="display: inline-block"
+                 :show-file-list="false"
+                 :on-success="handleUploadFileSuccess">
+        <el-button type="primary" @click="handleImport">上傳文件<i class="el-icon-top"></i></el-button>
+        <span slot="tip" class="el-upload__tip">只能上传xlsx文件</span>
+      </el-upload>
+
       <el-popconfirm
           style="margin: 0px 10px"
           confirm-button-text='好的'
@@ -32,32 +30,30 @@
         </el-button>
       </el-popconfirm>
 
-      <el-upload action="http://localhost:9090/user/import" style="display: inline-block"
-                 :show-file-list="false"
-                 accept="xlsx"
-                 :on-success="handleExcelImportSuccess">
 
-        <el-button type="primary" @click="handleImport">導入<i class="el-icon-circle-plus-outline"></i></el-button>
-        <span slot="tip" class="el-upload__tip">只能上传xlsx文件</span>
-      </el-upload>
-
-      <el-button type="primary" @click="handleExport">導出<i class="el-icon-circle-plus-outline"></i></el-button>
     </div>
     <!--    表格區域-->
     <el-table :data="tableData" border stripe @selection-change="handleSelectionChange">
-      <el-table-column
-          type="selection"
-          width="55">
+      <el-table-column type="selection" width="55"></el-table-column>
+      <el-table-column prop="id" label="ID"></el-table-column>
+      <el-table-column prop="name" label="文件名稱"></el-table-column>
+      <el-table-column prop="type" label="文件類型"></el-table-column>
+      <el-table-column prop="size" label="文件大小(KB)"></el-table-column>
+      <el-table-column label="下載連結">
+        <template slot-scope="scope">
+          <el-button type="primary" @click="download(scope.row.url)">下載</el-button>
+
+        </template>
       </el-table-column>
-      <!--            <el-table-column prop="id" label="ID"></el-table-column>-->
-      <el-table-column prop="username" label="帳號名稱"></el-table-column>
-      <el-table-column prop="nickname" label="暱稱"></el-table-column>
-      <el-table-column prop="email" label="電子信箱"></el-table-column>
-      <el-table-column prop="phone" label="電話"></el-table-column>
-      <el-table-column prop="address" label="地址"></el-table-column>
+      <el-table-column label="是否啟用">
+        <template slot-scope="scope">
+          <el-switch @change="changeEnable(scope.row)" v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ccc"></el-switch>
+
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
-          <el-button type="success" @click="handleEdit(scope.row)">編輯<i class="el-icon-edit"></i></el-button>
+
           <el-popconfirm
               class="ml-5"
               confirm-button-text='好的'
@@ -75,6 +71,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <!--          分頁區域-->
     <div style="padding: 10px 0">
       <el-pagination
@@ -87,66 +84,23 @@
           :total="total">
       </el-pagination>
     </div>
-    <!--          對話框-->
-    <!-- Form -->
-    <el-dialog title="用戶訊息" :visible.sync="dialogFormVisible" width="50%">
-      <el-form :model="form">
-        <el-form-item label="用戶名稱" :label-width="formLabelWidth">
-          <el-input v-model="form.username" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="用戶密碼" :label-width="formLabelWidth">
-          <el-input v-model="form.password" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="用戶暱稱" :label-width="formLabelWidth">
-          <el-input v-model="form.nickname" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="用戶電子信箱" :label-width="formLabelWidth">
-          <el-input v-model="form.email" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="用戶電話" :label-width="formLabelWidth">
-          <el-input v-model="form.phone" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="用戶地址" :label-width="formLabelWidth">
-          <el-input v-model="form.address" autocomplete="off"></el-input>
-        </el-form-item>
-
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveUser">确 定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 export default {
-  name: "User",
-  props: {},
+  name: "File.vue",
   data() {
     return {
       tableData: [],
       total: 0,
       pageSize: 5,
       pageNum: 1,
-      username: "",
-      email: "",
-      address: "",
-      dialogFormVisible: false,
-      // form: {
-      //   username: "",
-      //   password: "",
-      //   nickname: "",
-      //   email: "",
-      //   phone: "",
-      //   address: ""
-      // },
-      form: {},
-      formLabelWidth: "120px",
+      name: "",
       multipleSelection: [],
+
+
     }
-
-
   },
   created() {
     this.load()
@@ -155,13 +109,11 @@ export default {
   methods: {
     load() {
       //改用axios，使用參數加入
-      this.request.get("/user/page", {
+      this.request.get("/file/page", {
         params: {
           pageNum: this.pageNum,
           pageSize: this.pageSize,
-          username: this.username,
-          email: this.email,
-          address: this.address,
+          name: this.name,
         }
       })
           .then(res => {
@@ -200,14 +152,11 @@ export default {
       this.load()
     },
     reset() {
-      this.username = ""
-      this.email = ""
-      this.address = ""
+      this.name = ""
       this.load()
     },
     handleAdd() {
-      this.dialogFormVisible = true
-      this.form = {}
+
 
     },
     handleEdit(row) {
@@ -216,10 +165,10 @@ export default {
       // this.saveUser()
     },
     handleDelete(id) {
-      this.request.delete("/user/" + id)
+      this.request.delete("/file/" + id)
           .then(res => {
             console.log(res)
-            if (res.data) {
+            if (res.code === '200') {
               this.$message.success("刪除成功")
             } else {
               this.$message.error("刪除失敗")
@@ -237,7 +186,7 @@ export default {
 
     },
     saveUser() {
-      this.request.post("/user", this.form)
+      this.request.post("/file", this.form)
           .then(res => {
             console.log(res)
             if (res.data) {
@@ -264,7 +213,7 @@ export default {
       console.log(this.multipleSelection)
       let ids = this.multipleSelection.map(v => v.id)//[{},{},{}]=>[1,2,3]
       console.log(ids)
-      this.request.post("/user/delBatch", ids)
+      this.request.post("/file/delBatch", ids)
           .then(res => {
             console.log(res)
             if (res.data) {
@@ -280,10 +229,25 @@ export default {
     handleExcelImportSuccess() {
       this.$message.success("Excel導入成功")
       this.load()
+    },
+    handleUploadFileSuccess(res) {
+      console.log(res)
+      this.load()
+    },
+    download(url){
+      window.open(url)
+
+    },
+    changeEnable(row){
+      this.request.post("/file/update/", row)
+          .then(res=>{
+            console.log(res)
+            if(res.code === '200'){
+              this.$message.success("操作成功")
+            }
+          })
     }
   }
-
-
 }
 </script>
 

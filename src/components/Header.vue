@@ -55,7 +55,7 @@ export default {
         return this.$store.state.currentPathName;  //需要監聽的數據
       },
       set(val){
-        this.currentPathName = val
+        // this.currentPathName = val
       }
 
     }

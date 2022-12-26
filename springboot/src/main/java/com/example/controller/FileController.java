@@ -5,8 +5,12 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.common.Result;
 import com.example.entity.UploadFile;
+import com.example.entity.User;
 import com.example.mapper.FileMapper;
+import com.example.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +41,7 @@ public class FileController {
 
 
     /**
-     * 文件上傳街口
+     * 文件上傳接口
      *
      * @param file 前端傳遞過來的文件
      * @return
@@ -48,7 +52,7 @@ public class FileController {
         String originalFilename = file.getOriginalFilename();
         String type = FileUtil.extName(originalFilename);
         long size = file.getSize() / 1024;
-////        先存儲到磁盤
+////        先建立新文件
 ////        File uploadParentFile = new File(fileUploadPath);
 ////        判斷配置的文件目錄是否存在，若不存在則創建一個新的文件目錄
 //        if (!uploadParentFile.exists()) {
@@ -69,26 +73,21 @@ public class FileController {
         //當文件存在的時候獲取文件的md5
         String md5;
         String url;
-        if (uploadFile.exists()) {//當文件存在
-            //獲取文件的md5，通過對比文件md5，避免重複上傳相同內容的文件
-            md5 = SecureUtil.md5(uploadFile);//處理重複的檔案，首先先生成檔案的md5
-            System.out.println("=================md5: " +md5);//印出md5
-            UploadFile dbFile = getFileByMd5(md5);//從資料庫查詢文件的md5是否存在相同的紀錄
+        file.transferTo(uploadFile);//上傳文件到磁盤
+        md5 = SecureUtil.md5(uploadFile);//生成文件的md5
+        UploadFile dbFile = getFileByMd5(md5);//從資料庫查詢文件的md5是否存在相同的紀錄
 
-            //取得文件的url
-            if (dbFile != null) {
-                url = dbFile.getUrl();
-            } else {//文件url不存在
-            //把獲取到的文件存儲到磁盤目錄
-            file.transferTo(uploadFile);
-            url = "http://localhost:9090/file/" + fileUUID;
-            }
-        } else {//當文件不存在
-            //把獲取到的文件存儲到磁盤目錄
-            file.transferTo(uploadFile);
-            md5 = SecureUtil.md5(uploadFile);
+        //取得文件的url
+        if (dbFile != null) {//有重複文件
+            url = dbFile.getUrl();
+            uploadFile.delete();//由於文件已存在，所以刪除剛才上傳的重複文件
+        } else {//沒有重複文件
+            //資料庫若不存在重複文件，則不刪除剛才上傳的文件
             url = "http://localhost:9090/file/" + fileUUID;
         }
+
+
+
 
 
         //存儲數據庫
@@ -140,9 +139,80 @@ public class FileController {
         //查詢文件的md5是否存在
         QueryWrapper<UploadFile> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("md5", md5);
-//        List<UploadFile> fileList = fileMapper.selectList(queryWrapper);//也可使用List
-        UploadFile one = fileMapper.selectOne(queryWrapper);//使用selectOne方法，須將資料庫md5欄位設定為unique，取兩筆將會報錯
-        return one;
+
+//        UploadFile one = fileMapper.selectOne(queryWrapper);//使用selectOne方法，注意取到兩筆以上將會報錯
+        List<UploadFile> fileList = fileMapper.selectList(queryWrapper);//使用List
+//        if(fileList.size() == 0){
+//            fileList = null;
+//        }else{
+//            fileList.get(0);
+//        }
+        return fileList.size() == 0 ? null : fileList.get(0);
+    }
+
+    /**
+     * 分頁查詢接口
+     * @param pageNum
+     * @param pageSize
+     * @param name
+     * @return
+     */
+    @GetMapping("/page")
+    public Result findPage(@RequestParam Integer pageNum,
+                           @RequestParam Integer pageSize,
+                           @RequestParam(defaultValue = "") String name
+                           ) {
+        QueryWrapper<UploadFile> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_delete",false);//查詢未刪除的紀錄
+        queryWrapper.orderByDesc("id");
+        if(!"".equals(name)){
+            queryWrapper.like("name", name);
+        }
+
+        Page<UploadFile> objectPage = new Page<>(pageNum, pageSize);
+
+        Page<UploadFile> uploadFilePage = fileMapper.selectPage(objectPage, queryWrapper);
+
+        return Result.success(uploadFilePage);
+
+    }
+
+    //刪除
+    @DeleteMapping("/{id}")
+    public Result delete(@PathVariable Integer id) {
+        UploadFile uploadFile = fileMapper.selectById(id);
+        uploadFile.setIsDelete(true);
+        fileMapper.updateById(uploadFile);
+        return Result.success();
+
+
+//        boolean b = fileMapper.deleteById(id);
+//        return Result.success(b);
+
+    }
+
+    //批次刪除
+    @PostMapping("/delBatch")
+    public Result deleteBatch(@RequestBody List<Integer> ids) {
+        //select * from sys_file where id in (id,id,id...)
+        QueryWrapper<UploadFile> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("id",ids);
+        List<UploadFile> uploadFiles = fileMapper.selectList(queryWrapper);
+        for(UploadFile file : uploadFiles){
+            file.setIsDelete(true);
+            fileMapper.updateById(file);
+        }
+
+        return Result.success();
+
+    }
+
+    //新增或更新
+    @PostMapping("/update")
+    public Result update(@RequestBody UploadFile uploadFile) {
+        int i = fileMapper.updateById(uploadFile);
+
+        return Result.success(i);
     }
 
 }
