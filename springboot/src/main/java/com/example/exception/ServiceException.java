@@ -11,7 +11,7 @@ public class ServiceException extends RuntimeException{
 
     private String code;
 
-    public ServiceException(String code,String msg){
+    public ServiceException(String code,String msg){//自定義ServiceException
         super(msg);
         this.code = code;
     }

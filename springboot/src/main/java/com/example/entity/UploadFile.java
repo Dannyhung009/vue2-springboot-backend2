@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @TableName("sys_file")
-public class UploadFile {
+public class UploadFile {//上傳文件的Entity class
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     private String name;

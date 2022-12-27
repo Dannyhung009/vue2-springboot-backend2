@@ -57,28 +57,36 @@ public class UserController {
         return Result.success(b);
     }
 
-    //刪除
+    //刪除單筆
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Integer id) {
         boolean b = userService.removeById(id);
         return Result.success(b);
 
     }
+    //批次刪除
+    @PostMapping("/delBatch")
+    public Result deleteBatch(@RequestBody List<Integer> ids) {
+        boolean b = userService.removeBatchByIds(ids);
+
+        return Result.success(b);
+
+    }
 
     //查詢所有
     @GetMapping
-    public Result findall() {
+    public Result findAll() {
         List<User> list = userService.list();
         return Result.success(list);
     }
 
-    //根據ID查詢
+    //根據ID查詢單筆會員
     @GetMapping("/{id}")
-    public Result findOne(@PathVariable Integer id) {
+    public Result findByUserId(@PathVariable Integer id) {
         User user = userService.getById(id);
         return Result.success(user);
     }
-
+    //根據username查詢單筆會員
     @GetMapping("/username/{username}")
     public Result findByUsername(@PathVariable String username) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -116,17 +124,10 @@ public class UserController {
 //        return userService.page(new Page<>(pageNum, pageSize));
     }
 
-    //批次刪除
-    @PostMapping("/delBatch")
-    public Result deleteBatch(@RequestBody List<Integer> ids) {
-        boolean b = userService.removeBatchByIds(ids);
 
-        return Result.success(b);
-
-    }
 
     @GetMapping("/export")
-    public Result export(HttpServletResponse response) throws Exception {
+    public Result exportExcel(HttpServletResponse response) throws Exception {
         //從資料庫查出所有的數據
         List<User> list = userService.list();
         //通過工具類創建writer 寫出到磁盤路徑

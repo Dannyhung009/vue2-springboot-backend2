@@ -8,20 +8,20 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class InterceptorConfig implements WebMvcConfigurer {
+public class InterceptorConfig implements WebMvcConfigurer {//攔截器，負責攔截所有請求，只讓有登入的請求通過
 
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtInterceptor())
-                .addPathPatterns("/**") // 拦截所有请求，通过判断是否有 @LoginRequired 注解 决定是否需要登录
+        registry.addInterceptor(jwtInterceptor())//使用 jwtInterceptor() 攔截器
+                .addPathPatterns("/**") // 攔截所有請求，通過判斷是否有 @LoginRequired 註解 決定是否需要登錄
                 .excludePathPatterns("/user/login", "/user/register", "/user/export", "/user/import","/file/upload","/file/**");//例外接口不需要驗證登入
 
 
 
     }
     @Bean
-    public JwtInterceptor jwtInterceptor(){
+    public JwtInterceptor jwtInterceptor(){//使用@Bean將jwtInterceptor()注入到spring
         return new JwtInterceptor();
     }
 

@@ -24,7 +24,7 @@ import lombok.ToString;
 @ToString
 @Getter
 @Setter
-public class User implements Serializable {
+public class User implements Serializable {//會員資料的Entity class
 
     private static final long serialVersionUID = 1L;
 

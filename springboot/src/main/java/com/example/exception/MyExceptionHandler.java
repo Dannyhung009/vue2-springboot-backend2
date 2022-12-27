@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
-public class MyExceptionHandler {
+public class MyExceptionHandler {//統一異常接收器 Universal Exception Handler
 
 
     @ExceptionHandler(ServiceException.class)

@@ -16,7 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableWebMvc
 @EnableOpenApi
-public class SwaggerConfig {
+public class SwaggerConfig {//Swagger的設定config
 
     /**
      * 创建API应用
