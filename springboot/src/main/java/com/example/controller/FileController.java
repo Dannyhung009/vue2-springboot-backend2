@@ -11,6 +11,7 @@ import com.example.entity.UploadFile;
 import com.example.entity.User;
 import com.example.mapper.FileMapper;
 import com.example.utils.TokenUtils;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/file")
+@Api(tags = "文件上傳接口")
 public class FileController {
 
 //    @Value("${files.upload.path}")//提取在config裡面設定的檔案上傳位置

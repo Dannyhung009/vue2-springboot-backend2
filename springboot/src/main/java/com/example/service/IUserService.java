@@ -1,7 +1,6 @@
 package com.example.service;
 
-import com.example.common.Result;
-import com.example.controller.dto.UserDto;
+import com.example.entity.dto.UserDto;
 import com.example.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 

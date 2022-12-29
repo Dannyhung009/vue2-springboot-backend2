@@ -1,13 +1,19 @@
+#   設置port
 server:
   port: 9090
 
 spring:
+  #    配置Swagger 3
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  #      配置數據庫
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/springboot-vue2?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2b8
     username: root
     password: 088220
-
+#      配置Mybatis
 mybatis:
   mapper-locations:
     classpath:mapper/*.xml
@@ -15,10 +21,16 @@ mybatis:
 #  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 # for mybatis plus
+#      配置Mybatis Plus
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+#      配置文件上傳位置
 files:
   upload:
     path: D:/work/JAVA/vue1/springboot/files/
+
+
+
+

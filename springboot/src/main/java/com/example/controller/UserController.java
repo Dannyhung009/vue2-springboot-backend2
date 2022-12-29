@@ -7,18 +7,17 @@ import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.example.common.Constants;
 import com.example.common.Result;
-import com.example.controller.dto.UserDto;
+import com.example.entity.dto.UserDto;
 import com.example.utils.TokenUtils;
+import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -28,14 +27,11 @@ import com.example.service.IUserService;
 import com.example.entity.User;
 
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.MultipartFile;
-
-import static cn.hutool.poi.excel.sax.ElementName.row;
 
 /**
  * <p>
- * 前端控制器
+ * User控制器
  * 使用者資料接口(End point)
  * </p>
  *
@@ -44,6 +40,7 @@ import static cn.hutool.poi.excel.sax.ElementName.row;
  */
 @RestController
 @RequestMapping("/user")
+@Api(tags = "User資料接口")
 public class UserController {
 
     @Resource
@@ -104,10 +101,11 @@ public class UserController {
                            @RequestParam(defaultValue = "") String address) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("username", username);
+        //使用 and 方法 範例
         queryWrapper.and(w -> w.like("email", email));
 //        queryWrapper.like("nickname",nickname);
         queryWrapper.like("address", address);
-        //使用or 方法
+        //使用 or 方法 範例
 //        queryWrapper.or().like("address",address);
         queryWrapper.orderByDesc("create_time");
         Page<User> page = userService.page(new Page<>(pageNum, pageSize), queryWrapper);

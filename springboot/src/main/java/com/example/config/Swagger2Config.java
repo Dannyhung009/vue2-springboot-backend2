@@ -1,12 +1,11 @@
 package com.example.config;
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
@@ -14,9 +13,10 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
-@EnableWebMvc
-@EnableOpenApi
-public class SwaggerConfig {//Swagger的設定config
+@EnableSwagger2
+//@EnableWebMvc
+//@EnableOpenApi
+public class Swagger2Config {//Swagger的設定config
 
     /**
      * 创建API应用
@@ -48,9 +48,9 @@ public class SwaggerConfig {//Swagger的設定config
     private ApiInfo apiInfo(String title, String version) {
         return new ApiInfoBuilder()
                 .title(title)
-                .description("更多请关注: https://blog.csdn.net/xqnode")
-                .termsOfServiceUrl("https://blog.csdn.net/xqnode")
-                .contact(new Contact("xqnode", "https://blog.csdn.net/xqnode", "xiaqingweb@163.com"))
+//                .description("更多请关注: https://blog.csdn.net/xqnode")
+//                .termsOfServiceUrl("https://blog.csdn.net/xqnode")
+//                .contact(new Contact("xqnode", "https://blog.csdn.net/xqnode", "xiaqingweb@163.com"))
                 .version(version)
                 .build();
     }
