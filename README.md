@@ -1,4 +1,4 @@
-# 使用Springboot+vuejs建立一個後台管理系統
+# 使用Springboot+vuejs建立後台管理系統
 ## 使用技術棧
 + vuejs
 + vue router

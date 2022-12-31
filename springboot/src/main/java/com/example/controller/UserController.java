@@ -40,7 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("/user")
-@Api(tags = "User資料接口")
+@Api(tags = "User資料接口")//Swagger使用
 public class UserController {
 
     @Resource
@@ -49,24 +49,24 @@ public class UserController {
     //新增或更新
     @PostMapping
     public Result saveUser(@RequestBody User user) {
-        boolean b = userService.saveOrUpdate(user);
+        boolean saveOrUpdate = userService.saveOrUpdate(user);
 
-        return Result.success(b);
+        return Result.success(saveOrUpdate);
     }
 
     //刪除單筆
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Integer id) {
-        boolean b = userService.removeById(id);
-        return Result.success(b);
+        boolean remove = userService.removeById(id);
+        return Result.success(remove);
 
     }
     //批次刪除
     @PostMapping("/delBatch")
     public Result deleteBatch(@RequestBody List<Integer> ids) {
-        boolean b = userService.removeBatchByIds(ids);
+        boolean removeBatchByIds = userService.removeBatchByIds(ids);
 
-        return Result.success(b);
+        return Result.success(removeBatchByIds);
 
     }
 
@@ -80,16 +80,16 @@ public class UserController {
     //根據ID查詢單筆會員
     @GetMapping("/{id}")
     public Result findByUserId(@PathVariable Integer id) {
-        User user = userService.getById(id);
-        return Result.success(user);
+        User byId = userService.getById(id);
+        return Result.success(byId);
     }
     //根據username查詢單筆會員
     @GetMapping("/username/{username}")
     public Result findByUsername(@PathVariable String username) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
-        User one = userService.getOne(queryWrapper);
-        return Result.success(one);
+        User user = userService.getOne(queryWrapper);
+        return Result.success(user);
     }
 
     //分頁查詢
@@ -102,7 +102,7 @@ public class UserController {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("username", username);
         //使用 and 方法 範例
-        queryWrapper.and(w -> w.like("email", email));
+        queryWrapper.and(w -> w.like("email", email));//不一定要使用，Mybatis會自動生成 AND
 //        queryWrapper.like("nickname",nickname);
         queryWrapper.like("address", address);
         //使用 or 方法 範例
@@ -111,11 +111,11 @@ public class UserController {
         Page<User> page = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
 
         //測試獲取當前使用者資訊
-        if (TokenUtils.getCurrentUser() != null) {
-            User currentUser = TokenUtils.getCurrentUser();
-            System.out.println(currentUser);
-
-        }
+//        if (TokenUtils.getCurrentUser() != null) {
+//            User currentUser = TokenUtils.getCurrentUser();
+//            System.out.println(currentUser);
+//
+//        }
         return Result.success(page);
 
 
@@ -191,8 +191,8 @@ public class UserController {
 
 //        System.out.println(list); //測試有是否讀取成功
 
-        boolean b = userService.saveBatch(users);
-        return Result.success(b);
+        boolean saveBatch = userService.saveBatch(users);
+        return Result.success(saveBatch);
     }
 
     //舊版本
